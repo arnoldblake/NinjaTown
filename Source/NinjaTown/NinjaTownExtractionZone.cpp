@@ -3,6 +3,9 @@
 
 #include "NinjaTownExtractionZone.h"
 #include "Components/BoxComponent.h"
+#include "Components/DecalComponent.h"
+#include "NinjaTownCharacter.h"
+#include "NinjaTownGameMode.h"
 
 // Sets default values
 ANinjaTownExtractionZone::ANinjaTownExtractionZone()
@@ -14,6 +17,10 @@ ANinjaTownExtractionZone::ANinjaTownExtractionZone()
 	BoxComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	BoxComponent->SetBoxExtent(FVector(200.0f));
 	RootComponent = BoxComponent;
+
+	DecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalComponent"));
+	DecalComponent->DecalSize = FVector(200.0f);
+	DecalComponent->SetupAttachment(RootComponent);
 
 }
 
@@ -29,5 +36,15 @@ void ANinjaTownExtractionZone::BeginPlay()
 void ANinjaTownExtractionZone::HandleOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	UE_LOG(LogTemp, Log, TEXT("Overlap with extraction zone!"));
+
+	ANinjaTownCharacter* Character = Cast<ANinjaTownCharacter>(OtherActor);
+	if (Character && Character->bIsCarryingObjective)
+	{
+		ANinjaTownGameMode* GameMode = Cast<ANinjaTownGameMode>(GetWorld()->GetAuthGameMode());
+		if (GameMode)
+		{
+			GameMode->CompleteMission(Character);
+		}
+	}
 }
 

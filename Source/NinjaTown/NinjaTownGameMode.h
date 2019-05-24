@@ -13,6 +13,11 @@ class ANinjaTownGameMode : public AGameModeBase
 
 public:
 	ANinjaTownGameMode();
+
+	void CompleteMission(APawn* InstigatorPawn);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "GameMode")
+	void OnMissionCompleted(APawn* InstigatorPawn);
 };
 
 

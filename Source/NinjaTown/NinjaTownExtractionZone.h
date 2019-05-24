@@ -27,6 +27,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Components)
 	UBoxComponent* BoxComponent;
 
+	UPROPERTY(VisibleAnywhere, Category = Components)
+	UDecalComponent* DecalComponent;
+
 public:	
 
 };

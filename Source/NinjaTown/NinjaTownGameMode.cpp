@@ -15,3 +15,13 @@ ANinjaTownGameMode::ANinjaTownGameMode()
 	// use our custom HUD class
 	HUDClass = ANinjaTownHUD::StaticClass();
 }
+
+void ANinjaTownGameMode::CompleteMission(APawn* InstigatorPawn)
+{
+	if (InstigatorPawn)
+	{
+		InstigatorPawn->DisableInput(nullptr);
+	}
+
+	OnMissionCompleted(InstigatorPawn);
+}
