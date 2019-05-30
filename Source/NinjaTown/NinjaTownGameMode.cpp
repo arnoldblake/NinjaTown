@@ -4,6 +4,7 @@
 #include "NinjaTownHUD.h"
 #include "NinjaTownCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 ANinjaTownGameMode::ANinjaTownGameMode()
 	: Super()
@@ -21,6 +22,26 @@ void ANinjaTownGameMode::CompleteMission(APawn* InstigatorPawn)
 	if (InstigatorPawn)
 	{
 		InstigatorPawn->DisableInput(nullptr);
+		if (SpectatingViewpointClass)
+		{
+			TArray<AActor*> OutActors;
+			UGameplayStatics::GetAllActorsOfClass(this, SpectatingViewpointClass, OutActors);
+
+			if (OutActors.Num() > 0)
+			{
+				AActor* NewViewTarget = OutActors[0];
+
+				APlayerController* PlayerController = Cast<APlayerController>(InstigatorPawn->GetController());
+				if (PlayerController)
+				{
+					PlayerController->SetViewTargetWithBlend(NewViewTarget, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SpectatingViewpointClass is nullptr. Cannot change view target."));
+		}
 	}
 
 	OnMissionCompleted(InstigatorPawn);

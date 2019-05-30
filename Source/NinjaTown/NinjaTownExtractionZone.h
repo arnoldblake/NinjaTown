@@ -30,6 +30,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Components)
 	UDecalComponent* DecalComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = Sounds)
+	USoundBase* ObjectiveMissingSound;
+
 public:	
 
 };

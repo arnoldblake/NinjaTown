@@ -11,6 +11,11 @@ class ANinjaTownGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = Spectating)
+	TSubclassOf<AActor> SpectatingViewpointClass;
+
 public:
 	ANinjaTownGameMode();
 

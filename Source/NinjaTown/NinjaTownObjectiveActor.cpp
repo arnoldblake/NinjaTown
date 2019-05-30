@@ -2,7 +2,7 @@
 
 
 #include "NinjaTownObjectiveActor.h"
-#include "Components/SphereComponent.h"	
+#include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NinjaTownCharacter.h"

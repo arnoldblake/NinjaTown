@@ -4,6 +4,7 @@
 #include "NinjaTownExtractionZone.h"
 #include "Components/BoxComponent.h"
 #include "Components/DecalComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "NinjaTownCharacter.h"
 #include "NinjaTownGameMode.h"
 
@@ -35,16 +36,26 @@ void ANinjaTownExtractionZone::BeginPlay()
 
 void ANinjaTownExtractionZone::HandleOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Log, TEXT("Overlap with extraction zone!"));
 
 	ANinjaTownCharacter* Character = Cast<ANinjaTownCharacter>(OtherActor);
-	if (Character && Character->bIsCarryingObjective)
+	if (Character == nullptr)
 	{
+		return;
+	}
+
+	if (Character->bIsCarryingObjective)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Overlap with extraction zone!"));
+
 		ANinjaTownGameMode* GameMode = Cast<ANinjaTownGameMode>(GetWorld()->GetAuthGameMode());
 		if (GameMode)
 		{
 			GameMode->CompleteMission(Character);
 		}
+	}
+	else 
+	{
+		UGameplayStatics::PlaySound2D(this, ObjectiveMissingSound);
 	}
 }
 
