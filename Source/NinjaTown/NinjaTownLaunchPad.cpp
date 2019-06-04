@@ -33,5 +33,6 @@ void ANinjaTownLaunchPad::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player colliding with LaunchPad"));
 		Character->LaunchCharacter(LaunchVector, false, false);
+		UGameplayStatics::SpawnEmitterAtLocation(this, LaunchFX, GetActorLocation());
 	}
 }

@@ -30,6 +30,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = LaunchVelocity)
 	FVector LaunchVector;
 
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UParticleSystem* LaunchFX;
+
 public:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };
