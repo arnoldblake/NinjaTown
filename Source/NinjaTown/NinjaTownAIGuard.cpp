@@ -3,6 +3,7 @@
 
 #include "NinjaTownAIGuard.h"
 #include "Perception/PawnSensingComponent.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ANinjaTownAIGuard::ANinjaTownAIGuard()
@@ -11,13 +12,15 @@ ANinjaTownAIGuard::ANinjaTownAIGuard()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
-
 }
 
 // Called when the game starts or when spawned
 void ANinjaTownAIGuard::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PawnSensingComponent->OnSeePawn.AddDynamic(this, &ANinjaTownAIGuard::OnPawnSeen);
+	PawnSensingComponent->OnHearNoise.AddDynamic(this, &ANinjaTownAIGuard::OnNoiseHeard);
 	
 }
 
@@ -28,3 +31,16 @@ void ANinjaTownAIGuard::Tick(float DeltaTime)
 
 }
 
+void ANinjaTownAIGuard::OnPawnSeen(APawn* SeenPawn)
+{
+	if (SeenPawn == nullptr)
+	{
+		return;
+	}
+	DrawDebugSphere(GetWorld(), SeenPawn->GetActorLocation(), 32.0f, 12, FColor::Red, false, 10.0f);
+}
+
+void ANinjaTownAIGuard::OnNoiseHeard(APawn * NoiseInstigator, const FVector& Location, float Volume)
+{
+	DrawDebugSphere(GetWorld(), Location, 32.0f, 12, FColor::Green, false, 10.0f);
+}
