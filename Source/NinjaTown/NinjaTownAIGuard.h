@@ -6,7 +6,13 @@
 #include "GameFramework/Character.h"
 #include "NinjaTownAIGuard.generated.h"
 
-class UPawnSensingComponent;
+UENUM(BlueprintType)
+enum class EAIState : uint8
+{
+	Idle,
+	Suspicious,
+	Alerted
+};
 
 UCLASS()
 class NINJATOWN_API ANinjaTownAIGuard : public ACharacter
@@ -30,11 +36,18 @@ protected:
 	UFUNCTION()
 	void ResetOrientation();
 
+	void SetGuardState(EAIState NewState);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = AI)
+	void OnStateChanged(EAIState NewState);
+
 	UPROPERTY(VisibleAnywhere, Category = Component)
-	UPawnSensingComponent* PawnSensingComponent;
+	class UPawnSensingComponent* PawnSensingComponent;
 
 	FTimerHandle TimerHandle;
 	FRotator OriginalRotation;
+
+	EAIState GuardState;
 
 public:	
 	// Called every frame

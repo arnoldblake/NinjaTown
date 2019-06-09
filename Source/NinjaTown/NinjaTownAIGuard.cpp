@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 #include "NinjaTownGameMode.h"
 
+
 // Sets default values
 ANinjaTownAIGuard::ANinjaTownAIGuard()
 {
@@ -14,6 +15,7 @@ ANinjaTownAIGuard::ANinjaTownAIGuard()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
+	GuardState = EAIState::Idle;
 }
 
 // Called when the game starts or when spawned
@@ -25,7 +27,6 @@ void ANinjaTownAIGuard::BeginPlay()
 	PawnSensingComponent->OnHearNoise.AddDynamic(this, &ANinjaTownAIGuard::OnNoiseHeard);
 
 	OriginalRotation = GetActorRotation();
-	
 }
 
 // Called every frame
@@ -41,6 +42,7 @@ void ANinjaTownAIGuard::OnPawnSeen(APawn* SeenPawn)
 	{
 		return;
 	}
+
 	DrawDebugSphere(GetWorld(), SeenPawn->GetActorLocation(), 32.0f, 12, FColor::Red, false, 10.0f);
 	
 	ANinjaTownGameMode* GameMode = Cast<ANinjaTownGameMode>(GetWorld()->GetAuthGameMode());
@@ -48,10 +50,18 @@ void ANinjaTownAIGuard::OnPawnSeen(APawn* SeenPawn)
 	{
 		GameMode->CompleteMission(SeenPawn, false);
 	}
+
+	SetGuardState(EAIState::Alerted);
 }
 
 void ANinjaTownAIGuard::OnNoiseHeard(APawn * NoiseInstigator, const FVector& Location, float Volume)
 {
+	if (GuardState == EAIState::Alerted)
+	{
+		return;
+	}
+	SetGuardState(EAIState::Suspicious);
+
 	DrawDebugSphere(GetWorld(), Location, 32.0f, 12, FColor::Green, false, 10.0f);
 
 	FVector Direction = Location - GetActorLocation();
@@ -69,5 +79,21 @@ void ANinjaTownAIGuard::OnNoiseHeard(APawn * NoiseInstigator, const FVector& Loc
 
 void ANinjaTownAIGuard::ResetOrientation()
 {
+	if (GuardState == EAIState::Alerted)
+	{
+		return;
+	}
 	SetActorRotation(OriginalRotation);
+	SetGuardState(EAIState::Idle);
+}
+
+void ANinjaTownAIGuard::SetGuardState(EAIState NewState)
+{
+	if (GuardState == NewState)
+	{
+		return;
+	}
+
+	GuardState = NewState;
+	OnStateChanged(GuardState);
 }
