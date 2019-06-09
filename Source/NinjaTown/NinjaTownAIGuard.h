@@ -27,8 +27,14 @@ protected:
 	UFUNCTION()
 	void OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, float Volume);
 
+	UFUNCTION()
+	void ResetOrientation();
+
 	UPROPERTY(VisibleAnywhere, Category = Component)
 	UPawnSensingComponent* PawnSensingComponent;
+
+	FTimerHandle TimerHandle;
+	FRotator OriginalRotation;
 
 public:	
 	// Called every frame

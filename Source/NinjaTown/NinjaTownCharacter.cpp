@@ -164,6 +164,8 @@ void ANinjaTownCharacter::OnFire()
 				//Set Spawn Collision Handling Override
 				FActorSpawnParameters ActorSpawnParams;
 				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+				ActorSpawnParams.Instigator = this;
+
 
 				// spawn the projectile at the muzzle
 				World->SpawnActor<ANinjaTownProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);

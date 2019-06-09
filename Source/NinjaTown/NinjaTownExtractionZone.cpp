@@ -45,12 +45,10 @@ void ANinjaTownExtractionZone::HandleOverlap(UPrimitiveComponent* OverlappedComp
 
 	if (Character->bIsCarryingObjective)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Overlap with extraction zone!"));
-
 		ANinjaTownGameMode* GameMode = Cast<ANinjaTownGameMode>(GetWorld()->GetAuthGameMode());
 		if (GameMode)
 		{
-			GameMode->CompleteMission(Character);
+			GameMode->CompleteMission(Character, true);
 		}
 	}
 	else 

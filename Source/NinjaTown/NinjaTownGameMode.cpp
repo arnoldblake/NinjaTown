@@ -17,7 +17,7 @@ ANinjaTownGameMode::ANinjaTownGameMode()
 	HUDClass = ANinjaTownHUD::StaticClass();
 }
 
-void ANinjaTownGameMode::CompleteMission(APawn* InstigatorPawn)
+void ANinjaTownGameMode::CompleteMission(APawn* InstigatorPawn, bool bMissionSuccess)
 {
 	if (InstigatorPawn)
 	{
@@ -44,5 +44,5 @@ void ANinjaTownGameMode::CompleteMission(APawn* InstigatorPawn)
 		}
 	}
 
-	OnMissionCompleted(InstigatorPawn);
+	OnMissionCompleted(InstigatorPawn, bMissionSuccess);
 }
