@@ -6,6 +6,8 @@
 #include "DrawDebugHelpers.h"
 #include "TimerManager.h"
 #include "NinjaTownGameMode.h"
+#include "AI/NavigationSystemBase.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 
 
 // Sets default values
@@ -27,12 +29,50 @@ void ANinjaTownAIGuard::BeginPlay()
 	PawnSensingComponent->OnHearNoise.AddDynamic(this, &ANinjaTownAIGuard::OnNoiseHeard);
 
 	OriginalRotation = GetActorRotation();
+
+	UE_LOG(LogTemp, Warning, TEXT("MyCharacter's Bool is %s"), (bPatrol ? TEXT("True") : TEXT("False")));
+
+	if (bPatrol)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BeginPlay calling MoveToNextPatrolPoint"));
+		MoveToNextPatrolPoint();
+	}
+
+}
+
+void ANinjaTownAIGuard::MoveToNextPatrolPoint()
+{
+	if (CurrentPatrolPoint == nullptr || CurrentPatrolPoint == SecondPatrolPoint)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MoveToNextPatrolPoint setting firstpatrolpoint"));
+		CurrentPatrolPoint = FirstPatrolPoint;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MoveToNextPatrolPoint setting secondpatrolpoint"));
+		CurrentPatrolPoint = SecondPatrolPoint;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Navigation moving to patrolpoint"));
+	//UNavigationSystem::SimpleMoveToActor(GetController(), CurrentPatrolPoint);
+	UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController(), CurrentPatrolPoint);
 }
 
 // Called every frame
 void ANinjaTownAIGuard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (CurrentPatrolPoint)
+	{
+		FVector Delta = GetActorLocation() - CurrentPatrolPoint->GetActorLocation();
+		float DistanceToGoal = Delta.Size();
+
+		if (DistanceToGoal < 50)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Reached Goal Setting Next Patrol Point"));
+			MoveToNextPatrolPoint();
+		}
+	}
 
 }
 
@@ -52,6 +92,12 @@ void ANinjaTownAIGuard::OnPawnSeen(APawn* SeenPawn)
 	}
 
 	SetGuardState(EAIState::Alerted);
+
+	AController* Controller = GetController();
+	if (Controller)
+	{
+		Controller->StopMovement();
+	}
 }
 
 void ANinjaTownAIGuard::OnNoiseHeard(APawn * NoiseInstigator, const FVector& Location, float Volume)
@@ -75,6 +121,12 @@ void ANinjaTownAIGuard::OnNoiseHeard(APawn * NoiseInstigator, const FVector& Loc
 
 	GetWorldTimerManager().ClearTimer(TimerHandle);
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &ANinjaTownAIGuard::ResetOrientation, 3.0f);
+
+	AController* Controller = GetController();
+	if (Controller)
+	{
+		Controller->StopMovement();
+	}
 }
 
 void ANinjaTownAIGuard::ResetOrientation()
@@ -85,6 +137,11 @@ void ANinjaTownAIGuard::ResetOrientation()
 	}
 	SetActorRotation(OriginalRotation);
 	SetGuardState(EAIState::Idle);
+
+	if (bPatrol)
+	{
+		MoveToNextPatrolPoint();
+	}
 }
 
 void ANinjaTownAIGuard::SetGuardState(EAIState NewState)
